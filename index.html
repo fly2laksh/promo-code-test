@@ -4,98 +4,934 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fly2laksh - Enterprise Data, Automation & AI Solutions</title>
-    <meta name="description" content="Professional Power BI, Excel Automation, Zoho CRM and Data solutions for growing businesses.">
-    
-    <!-- Google Fonts & FontAwesome -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- External CSS File Link -->
+    <!-- SheetJS Library for Excel processing (Added for GST Tool) -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <!-- External CSS File -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Top Bar -->
+    <!-- Preloader Start (Diwali Special GIF) -->
+    <div id="preloader">
+        <img src="https://lh3.googleusercontent.com/d/1tvZBBsKyv8va1sVQUfavozZ-gfqSEL2-" alt="Loading GIF">
+    </div>
+    <!-- Preloader End -->
+
+    <canvas id="dotCanvas"></canvas>
+
     <div class="top-bar">
-        NEXT-GEN ENTERPRISE DATA & CRM AUTOMATION | SERVING NEW DELHI | GURUGRAM | NOIDA
+        <div class="marquee-content">
+            ⚡ NEXT-GEN ENTERPRISE DATA & CRM AUTOMATION     |     📍 SERVING NEW DELHI | GURUGRAM | NOIDA     |     📊 POWER BI, EXCEL UTILITIES & ZOHO CRM ARCHITECTURE
+        </div>
     </div>
 
-    <!-- Navigation -->
     <nav>
-        <a href="#" class="logo">
-            <span>fly2laksh</span>
+        <a class="logo" onclick="showTab('home')">
+            <img src="https://lh3.googleusercontent.com/d/1S2Nxhr01HSRRtb6LwTpWiWtDJGTDA2fg" alt="Bird Logo" class="bird-logo-img">
+            <span class="ai-dynamic-text"></span>
         </a>
+        
+        <div class="mobile-toggle" onclick="toggleMobileMenu()">
+            <i class="fa-solid fa-bars" id="menu-icon"></i>
+        </div>
 
         <ul class="nav-links" id="nav-links">
-            <li><a href="#home">HOME</a></li>
-            <li><a href="#services">SERVICES</a></li>
-            <li><a href="#contact">CONTACT</a></li>
+            <!-- 1. HOME -->
+            <li><a onclick="showTab('home')" id="link-home" class="active-link">HOME</a></li>
+            
+            <!-- 2. SERVICES BUTTON -->
+            <li>
+                <a onclick="showTab('portfolio')" id="link-portfolio">SERVICES</a>
+            </li>
+
+            <!-- 3. PORTFOLIO BUTTON -->
+            <li onclick="toggleDropdown(this)">
+                <a id="link-services">
+                    PORTFOLIO <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 2px;"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a onclick="showTab('services', 'sec-data')" class="dropdown-item"><i class="fa-solid fa-chart-line" style="color:var(--neon-blue);"></i> Data Management (Excel & BI)</a></li>
+                    <li><a onclick="showTab('services', 'sec-zoho')" class="dropdown-item"><i class="fa-solid fa-diagram-project" style="color:var(--neon-cyan);"></i> Zoho Services</a></li>
+                    <li><a onclick="showTab('services', 'sec-training')" class="dropdown-item"><i class="fa-solid fa-user-graduate" style="color:var(--neon-pink);"></i> Staff & Freelancing Training</a></li>
+                    <li><a onclick="showTab('services', 'sec-web')" class="dropdown-item"><i class="fa-solid fa-code" style="color:var(--accent-amber);"></i> Website & Tools Building</a></li>
+                    <li><a onclick="showTab('services', 'sec-finance')" class="dropdown-item"><i class="fa-solid fa-calculator" style="color:var(--accent-green);"></i> Account & Finance</a></li>
+                    <li><a onclick="showTab('services', 'sec-maintenance')" class="dropdown-item"><i class="fa-solid fa-arrows-rotate" style="color:var(--neon-purple);"></i> Maintenance & Packages</a></li>
+                </ul>
+            </li>
+
+            <!-- NEW INTEGRATION BUTTON ADDED HERE -->
+            <li>
+                <a onclick="showTab('integration')" id="link-integration">INTEGRATION</a>
+            </li>
+
+            <!-- 4. CONTACT -->
+            <li onclick="toggleDropdown(this)">
+                <a id="link-contact">
+                    CONTACT <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 2px;"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a onclick="showTab('contact', 'contact-student')" class="dropdown-item"><i class="fa-solid fa-graduation-cap"></i> Student Portal</a></li>
+                    <li><a onclick="showTab('contact', 'contact-pro')" class="dropdown-item"><i class="fa-solid fa-user-tie"></i> Professional Portal</a></li>
+                    <li><a onclick="showTab('contact', 'contact-biz')" class="dropdown-item"><i class="fa-solid fa-building"></i> Business Consultation</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="container" id="home">
-        <div class="hero-card">
-            <div class="hero-text">
-                <h1>Smart Data & Automation Solutions for Growing Businesses</h1>
-                <p>We convert messy, unstructured enterprise data into real-time business intelligence and automate sales workflows so you scale faster with precision.</p>
-                <button class="btn-primary" onclick="openConsultationModal()">
-                    <i class="fa-solid fa-calendar-check"></i> Book a Free Consultation
-                </button>
+    <!-- PROFESSIONAL CONSULTATION MODAL POPUP -->
+    <div class="consultation-modal-overlay" id="consultationModal">
+        <div class="consultation-modal-box">
+            <button class="modal-close-btn" onclick="closeConsultationModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 1.2rem;">Book a Free Consultation</h3>
+                <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 5px;">Fill your requirement details below. Saves to Google Sheet & opens WhatsApp.</p>
             </div>
-        </div>
-    </section>
-
-    <!-- Services Section & Promo Code -->
-    <section class="container" id="services">
-        <h2 class="section-title">Official Services & Pricing</h2>
-
-        <!-- Promo Code Input Box -->
-        <div class="promo-box">
-            <input type="text" id="promo-input" placeholder="Promo code dalein (e.g., FLY10)">
-            <button onclick="applyPromoCode()" class="btn-primary">Apply</button>
-        </div>
-        <div id="promo-message"></div>
-
-        <div class="services-grid">
-            <div class="service-card">
-                <span class="badge">Popular</span>
-                <h3>Advanced Excel Dashboard</h3>
-                <p>Dynamic executive business dashboards built using XLOOKUP, INDEX/MATCH, and Pivots.</p>
-                
-                <!-- Price Box with attributes for JavaScript -->
-                <div class="price" data-min="5000" data-max="15000">
-                    <span class="price-display">₹5,000 – ₹15,000</span>
-                    <span>/ dashboard</span>
+            
+            <form id="consultationForm" onsubmit="submitConsultationForm(event)">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-user"></i> Your Name *</label>
+                    <input type="text" id="c_name" required placeholder="Enter your full name">
                 </div>
-
-                <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Advanced%20Excel%20Dashboard" class="btn-primary" target="_blank">
-                    Inquire Now
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>© 2026 fly2laksh. All Rights Reserved. Contact: 098918 81990</p>
-    </footer>
-
-    <!-- Consultation Modal -->
-    <div class="modal-overlay" id="consultationModal">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeConsultationModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h3>Book Free Consultation</h3>
-            <form onsubmit="submitConsultationForm(event)">
-                <input type="text" id="c_name" placeholder="Full Name" required>
-                <input type="tel" id="c_phone" placeholder="Phone Number" required>
-                <button type="submit" class="btn-primary">Submit & Connect on WhatsApp</button>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-phone"></i> WhatsApp Number *</label>
+                    <input type="tel" id="c_phone" required placeholder="e.g. 9891881990">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-envelope"></i> Email Address *</label>
+                    <input type="email" id="c_email" required placeholder="Enter your email address">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-briefcase"></i> Service Required *</label>
+                    <select id="c_service" required>
+                        <option value="" disabled selected>Select Service Domain</option>
+                        <option value="Data Management & Power BI">Data Management & Power BI</option>
+                        <option value="Zoho CRM Implementation">Zoho CRM Implementation</option>
+                        <option value="GST & Tax Compliance">GST & Tax Compliance</option>
+                        <option value="Website & Tools Building">Website & Tools Building</option>
+                        <option value="Staff Training & Mentorship">Staff Training & Mentorship</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-comment-dots"></i> Project Requirement / Details</label>
+                    <textarea id="c_message" rows="3" placeholder="Briefly describe what you want to automate or build..."></textarea>
+                </div>
+                <button type="submit" class="btn-ai-primary" style="width: 100%; padding: 12px; justify-content: center; font-size: 0.9rem;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit & Connect via WhatsApp
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- External JS File Link -->
+    <!-- HOME TAB -->
+    <div id="tab-home" class="page-tab active-tab">
+        <div class="container">
+            <div class="hero-ai-wrapper">
+                <div class="hero-top-row">
+                    <div class="hero-logo-box">
+                        <img src="https://lh3.googleusercontent.com/d/10uSt7-8i-tVkk9uCpuWG1rv5Bb-AwGvx" alt="Fly2Laksh Logo">
+                    </div>
+                    
+                    <div class="hero-text-box">
+                        <h1 class="hero-main-title">Smart Data & Automation Solutions for Growing Businesses</h1>
+                        <p class="hero-desc-text">
+                            We convert messy, unstructured enterprise data into real-time business intelligence and automate sales workflows so you scale faster with precision.
+                        </p>
+                        <!-- ADDED BOOK A FREE CONSULTATION BUTTON -->
+                        <div style="margin-top: 20px;">
+                            <button onclick="openConsultationModal()" class="btn-ai-primary" style="padding: 12px 25px; font-size: 0.9rem;">
+                                <i class="fa-solid fa-calendar-check"></i> Book a Free Consultation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW CENTERED FULL-PAGE AI BANNER SLIDER -->
+            <div class="ai-banner-container">
+                <button class="slider-btn prev" onclick="moveBannerSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="slider-btn next" onclick="moveBannerSlide(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                
+                <div class="ai-banner-slider" id="aiBannerSlider">
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/18WzaHcl6VB9Z8QzJWuHXsj4Heero4QWw" alt="Banner 1"></div>
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/1XxUVxeiexNCljl1bzj8daCgyekLPUfYd" alt="Banner 2"></div>
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/1RLQnKwgxF_li5uI5d45LElanvQnzxQu3" alt="Banner 3"></div>
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/1I-xz2zfXEKcjSXRj8Ze-AQ1yQo-ZDfrf" alt="Banner 4"></div>
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/14WvEfD1c2Nlh046UPOO-3QBAn897dIMY" alt="Banner 5"></div>
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/1gZ7rA-DTsmSzVu3A0A7TghcLuusTyp4u" alt="Banner 6"></div>
+                    <div class="ai-banner-slide"><img src="https://lh3.googleusercontent.com/d/1rywYBPlDQyZBDgscAiPdHg-0NKNMhNYc" alt="Banner 7"></div>
+                </div>
+
+                <div class="slider-dots" id="sliderDots">
+                    <div class="dot active" onclick="goToBannerSlide(0)"></div>
+                    <div class="dot" onclick="goToBannerSlide(1)"></div>
+                    <div class="dot" onclick="goToBannerSlide(2)"></div>
+                    <div class="dot" onclick="goToBannerSlide(3)"></div>
+                    <div class="dot" onclick="goToBannerSlide(4)"></div>
+                    <div class="dot" onclick="goToBannerSlide(5)"></div>
+                    <div class="dot" onclick="goToBannerSlide(6)"></div>
+                </div>
+            </div>
+
+            <div class="banner-header">
+                <h2>Why Choose <span class="ai-dynamic-text">fly2laksh</span>?</h2>
+            </div>
+
+            <div class="profile-flex">
+                <img src="https://lh3.googleusercontent.com/d/10Z1RvrSZi-w2bcbN8PPXECF7CitHG9pR" alt="Profile" class="profile-img" onerror="this.src='https://via.placeholder.com/180x220?text=Profile+Photo'">
+                <div class="profile-text">
+                    <h3 style="color:var(--text-white); margin-bottom: 14px; font-family:'Orbitron', sans-serif;">We Don't Just Organize Data—We Build Systems That Scale Your Business</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-shield-halved" style="color:var(--neon-blue); margin-top: 4px;"></i> <div><strong>10+ Years of Corporate Expertise:</strong> Deep financial insight, advanced data analytics, and workflow automation for complex operations.</div></li>
+                        <li><i class="fa-solid fa-code" style="color:var(--neon-blue); margin-top: 4px;"></i> <div><strong>Tailored Architecture:</strong> From migrating 60 Lakh+ records seamlessly into Zoho CRM to writing custom Google Apps Script code, we solve operational bottlenecks.</div></li>
+                        <li><i class="fa-solid fa-gauge-high" style="color:var(--neon-blue); margin-top: 4px;"></i> <div><strong>Hard Impact Metrics:</strong> Reduce manual compliance prep time by up to 90% and boost sales conversion visibility for instant decision-making.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="banner-header">
+                <h2>Our Core Capability Pillars</h2>
+            </div>
+
+            <div class="three-pillars">
+                <div class="pillar-card">
+                    <img src="https://lh3.googleusercontent.com/d/14IqT_fh6Atk_dHegzbgARski2sRIM37z" alt="Smart Automation" onerror="this.src='https://via.placeholder.com/200x150?text=Automation'">
+                    <h3>Smart Automation</h3>
+                    <p>Eliminate manual entry errors. We build automated Excel-to-JSON tools and robust Zoho CRM workflows operating on autopilot.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <img src="https://lh3.googleusercontent.com/d/1YRkH-Qfhhh7JWQWYlPrcYEN2__GLHUTr" alt="Data-Driven Insights" onerror="this.src='https://via.placeholder.com/200x150?text=Analytics'">
+                    <h3>Data-Driven Insights</h3>
+                    <p>Track business KPIs effortlessly. We transform raw spreadsheets into interactive Power BI dashboards and SQL analytics reports.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <img src="https://lh3.googleusercontent.com/d/1YmQSRzoxoU0xy3V9YMwsSnO0re-aQtAa" alt="Financial Compliance" onerror="this.src='https://via.placeholder.com/200x150?text=Finance'">
+                    <h3>Financial Compliance</h3>
+                    <p>Secure financial integrity. From structured bookkeeping and Tally entries to accurate GST and ITR computation, we handle it all.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERVICES TAB -->
+    <div id="tab-services" class="page-tab">
+        <div class="container">
+            <div class="banner-header">
+                <h2>Official Services, Demos & Pricing</h2>
+                <p style="color: var(--text-dim); margin-top: 6px; font-size: 0.9rem;">Explore video demonstrations, sample dashboards, and official rate cards across all domain pillars:</p>
+                <!-- DUAL BROCHURE BUTTONS ADDED HERE -->
+                <div style="margin-top: 15px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://lh3.googleusercontent.com/d/1aXXeEnxnDOqIfApBO4dLRhNfjJdl36NS" target="_blank" class="btn-ai-outline">
+                        <i class="fa-solid fa-file-lines" style="color: var(--neon-blue);"></i> Service Brochure
+                    </a>
+                    <a href="https://lh3.googleusercontent.com/d/1jkKWnwUeC42D5nvJvzaanU5Y9S3vd3MK" target="_blank" class="btn-ai-outline">
+                        <i class="fa-solid fa-file-pdf" style="color: var(--neon-pink);"></i> Service Rate Brochure
+                    </a>
+                </div>
+            </div>
+
+            <div class="filter-buttons-container">
+                <button class="service-filter-btn active-filter" onclick="filterServices('all', this)">
+                    <i class="fa-solid fa-border-all"></i> All Services
+                </button>
+                <button class="service-filter-btn" onclick="filterServices('sec-data', this)">
+                    <i class="fa-solid fa-chart-line"></i> Data Management
+                </button>
+                <button class="service-filter-btn" onclick="filterServices('sec-zoho', this)">
+                    <i class="fa-solid fa-diagram-project"></i> Zoho Services
+                </button>
+                <button class="service-filter-btn" onclick="filterServices('sec-training', this)">
+                    <i class="fa-solid fa-user-graduate"></i> Staff Training
+                </button>
+                <button class="service-filter-btn" onclick="filterServices('sec-web', this)">
+                    <i class="fa-solid fa-code"></i> Website & Tools
+                </button>
+                <button class="service-filter-btn" onclick="filterServices('sec-finance', this)">
+                    <i class="fa-solid fa-calculator"></i> Account & Finance
+                </button>
+                <button class="service-filter-btn" onclick="filterServices('sec-maintenance', this)">
+                    <i class="fa-solid fa-arrows-rotate"></i> Maintenance
+                </button>
+            </div>
+
+            <div class="service-category-block" id="sec-data">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-chart-line"></i> 1. Data Management (Excel & Power BI)
+                </div>
+
+                <div class="media-preview-box">
+                    <h4 style="font-family:'Orbitron'; font-size:0.9rem; color:var(--neon-blue); margin-bottom:12px;">
+                        <i class="fa-brands fa-youtube" style="color: red;"></i> Video Demonstrations & Dashboard Previews
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/k-rItj7_1Yk" title="Data Management Demo 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                            <p style="font-size:0.75rem; color:var(--text-dim); text-align:center;">Data Cleaning & Automated Excel MIS Setup</p>
+                        </div>
+                        <div>
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/Z5gEfJXPJBM" title="Data Management Demo 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                            <p style="font-size:0.75rem; color:var(--text-dim); text-align:center;">Power BI Advanced Analytics Demonstration</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                        <a href="https://drive.google.com/file/d/1QRpVVyE5bR0t3z_H_nKhZQS_RoFVraMo/view?usp=sharing" target="_blank" class="btn-ai-outline">
+                            <i class="fa-solid fa-chart-pie" style="color:var(--neon-cyan);"></i> Analytics Chart Preview 1
+                        </a>
+                        <a href="https://drive.google.com/file/d/1lh1PDRZIHA30KYSPWzd_PCiRT4cAuc7Z/view?usp=sharing" target="_blank" class="btn-ai-outline">
+                            <i class="fa-solid fa-chart-line" style="color:var(--accent-amber);"></i> Analytics Chart Preview 2
+                        </a>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;">
+                    <img src="https://lh3.googleusercontent.com/d/1j93fkEOM7yY6AVAWJkWZDMZCyIANd20b" 
+                         alt="Data Management Preview" 
+                         style="width: 100%; max-width: 1500px; height: auto; border-radius: 12px; border: 1px solid var(--card-border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+                </div>
+                <div class="services-grid">
+                    <div class="service-card-item">
+                        <div class="card-badge">Excel</div>
+                        <h3>Basic Excel Cleanup</h3>
+                        <p>Cleaning messy datasets, formatting, deduplication, and bank statement conversions.</p>
+                        <div class="card-price-tag">₹1,500 – ₹3,000 <span>/ project</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Remove Duplicates & Blanks</li>
+                            <li><i class="fa-solid fa-check"></i> Bank Statement to Clean Excel</li>
+                            <li><i class="fa-solid fa-check"></i> Standard Formatting</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Basic%20Excel%20Cleanup" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge gold">Popular</div>
+                        <h3>Advanced Excel Dashboard</h3>
+                        <p>Dynamic executive business dashboards built using XLOOKUP, INDEX/MATCH, and Pivots.</p>
+                        <div class="card-price-tag">₹5,000 – ₹15,000 <span>/ dashboard</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Dynamic Pivot & Chart Layouts</li>
+                            <li><i class="fa-solid fa-check"></i> Automated KPI Summary Cards</li>
+                            <li><i class="fa-solid fa-check"></i> Multi-Source Data Links</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Advanced%20Excel%20Dashboard" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge">Automation</div>
+                        <h3>Excel Macros & Automation</h3>
+                        <p>VBA macros and Google Apps Scripts for 1-click repetitive work automation.</p>
+                        <div class="card-price-tag">₹3,000 – ₹12,000 <span>/ automation</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Custom VBA / Script Code</li>
+                            <li><i class="fa-solid fa-check"></i> One-Click Auto Processing</li>
+                            <li><i class="fa-solid fa-check"></i> Error-Free Bulk Generation</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Excel%20Automation" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge">Power BI</div>
+                        <h3>Power BI Dashboards</h3>
+                        <p>Interactive Power BI reports with DAX calculations, Power Query ETL, and real-time insights.</p>
+                        <div class="card-price-tag">₹10,000 – ₹35,000 <span>/ report</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Single or Multi-Page Tab Layouts</li>
+                            <li><i class="fa-solid fa-check"></i> Power Query ETL & DAX Measures</li>
+                            <li><i class="fa-solid fa-check"></i> Interactive Slicers & Filters</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Power%20BI%20Dashboard" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-category-block" id="sec-zoho">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-diagram-project"></i> 2. Zoho Services & CRM Architecture
+                </div>
+
+                <div class="media-preview-box">
+                    <h4 style="font-family:'Orbitron'; font-size:0.9rem; color:var(--neon-cyan); margin-bottom:8px;">
+                        <i class="fa-solid fa-folder-open"></i> Zoho CRM Live Dashboards & Architecture Samples
+                    </h4>
+                    <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:12px;">Explore our archived portfolio of deployed Zoho CRM modules, Deluge workflow blueprints, and sales pipelines:</p>
+                    <a href="https://drive.google.com/drive/u/0/folders/1lcGQsFw438eGbImlo3VsjKBQIlch3UoN" target="_blank" class="btn-ai-outline">
+                        <i class="fa-brands fa-google-drive" style="color:var(--accent-green);"></i> Open Zoho CRM Dashboards Folder
+                    </a>
+                </div> 
+                <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;"> 
+                    <img src="https://lh3.googleusercontent.com/d/16G3fdG0cW4FM-InnJiMU_2Tt9jarnhOc" 
+                        alt="Zoho CRM Preview" style="width: 100%; max-width: 1500px; height: auto; border-radius: 12px; border: 1px solid var(--card-border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);"> 
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card-item">
+                        <div class="card-badge gold">Full Suite</div>
+                        <h3>Zoho Implementation</h3>
+                        <p>End-to-end Zoho CRM deployment, multi-module architecture, and 60L+ record data migration.</p>
+                        <div class="card-price-tag">₹35,000 – ₹80,000 <span>/ setup</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Full System Deployment & User Roles</li>
+                            <li><i class="fa-solid fa-check"></i> Bulk Data Migration (60L+ Records)</li>
+                            <li><i class="fa-solid fa-check"></i> End-to-End Sales Pipeline Setup</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Zoho%20Implementation" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge">Custom UI</div>
+                        <h3>Zoho Customisation</h3>
+                        <p>Tailored module design, custom fields, layout rules, and specific business logic mapping.</p>
+                        <div class="card-price-tag">₹12,000 – ₹25,000 <span>/ project</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Custom Modules & Field Layouts</li>
+                            <li><i class="fa-solid fa-check"></i> Conditional Layout Rules</li>
+                            <li><i class="fa-solid fa-check"></i> Business Logic Mapping</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Zoho%20Customisation" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge">Automation</div>
+                        <h3>Zoho Automation</h3>
+                        <p>Automated lead routing, Deluge scripts, email/WhatsApp triggers, and workflow blueprints.</p>
+                        <div class="card-price-tag">₹15,000 – ₹40,000 <span>/ workflow</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Deluge Scripting & API Webhooks</li>
+                            <li><i class="fa-solid fa-check"></i> Automatic Lead Assignment Rules</li>
+                            <li><i class="fa-solid fa-check"></i> Email & WhatsApp Triggers</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Zooh%20Automation" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-category-block" id="sec-training">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-user-graduate"></i> 3. Staff & Freelancing Training
+                </div>
+                <div class="services-grid">
+                    <div class="service-card-item">
+                        <div class="card-badge">Corporate</div>
+                        <h3>Staff Training & Workshops</h3>
+                        <p>Corporate team coaching for Excel, Power BI, and MIS automation to boost team productivity.</p>
+                        <div class="card-price-tag">₹4,000 – ₹25,000 <span>/ workshop</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Group Batches (3-10 Staff) & Workshops</li>
+                            <li><i class="fa-solid fa-check"></i> Real Company Dataset Practice</li>
+                            <li><i class="fa-solid fa-check"></i> SOPs & Practical Study Material</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Staff%20Training" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge gold">New Career</div>
+                        <h3>Freelancing Mentorship</h3>
+                        <p>Guidance to set up Fiverr/Upwork profiles, get international clients, and deliver data/MIS projects.</p>
+                        <div class="card-price-tag">₹5,000 – ₹10,000 <span>/ course</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Fiverr & Upwork Account Optimisation</li>
+                            <li><i class="fa-solid fa-check"></i> Client Pitching & Proposal Writing</li>
+                            <li><i class="fa-solid fa-check"></i> Portfolio Building & Live Projects</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Freelancing%20Training" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-category-block" id="sec-web">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-code"></i> 4. Website & Tools Building
+                </div>
+
+                <div class="media-preview-box">
+                    <h4 style="font-family:'Orbitron'; font-size:0.9rem; color:var(--accent-amber); margin-bottom:12px;">
+                        <i class="fa-brands fa-youtube" style="color: red;"></i> Web Development & Tool Showcase
+                    </h4>
+                    <div style="max-width: 600px; margin: 0 auto;">
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/_QKHHNyvtfo" title="Website & Tools Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card-item">
+                        <div class="card-badge">Web Dev</div>
+                        <h3>Business Website Development</h3>
+                        <p>Modern, fast-loading, responsive business website with contact forms and mobile optimisation.</p>
+                        <div class="card-price-tag">₹8,000 – ₹25,000 <span>/ website</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Responsive UI Design & Animation</li>
+                            <li><i class="fa-solid fa-check"></i> SEO Optimised & Mobile Ready</li>
+                            <li><i class="fa-solid fa-check"></i> WhatsApp Lead Capture Integration</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Business%20Website%20Development" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge gold">Custom Portal</div>
+                        <h3>Custom Web Tools & Portals</h3>
+                        <p>Custom web applications, business calculators, employee portals, and API dashboard systems.</p>
+                        <div class="card-price-tag">₹15,000 – ₹45,000 <span>/ tool</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Tailored Internal Web Dashboards</li>
+                            <li><i class="fa-solid fa-check"></i> Dynamic Calculators & Data Portals</li>
+                            <li><i class="fa-solid fa-check"></i> Third-Party API Integrations</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Custom%20Web%20Tools%20Building" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-category-block" id="sec-finance">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-calculator"></i> 5. Account & Finance
+                </div>
+                <div class="services-grid">
+                    <div class="service-card-item">
+                        <div class="card-badge">Tax Return</div>
+                        <h3>GST Filing & Compliance</h3>
+                        <p>Accurate GSTR-1 and GSTR-3B return filing, monthly compliance, and invoice management.</p>
+                        <div class="card-price-tag">₹1,000 – ₹2,500 <span>/ month</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> GSTR-1 & GSTR-3B Timely Filings</li>
+                            <li><i class="fa-solid fa-check"></i> Invoice Cleaning & Categorisation</li>
+                            <li><i class="fa-solid fa-check"></i> Zero Penalty Assurance</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20GST%20Filing%20Service" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge">ITC Match</div>
+                        <h3>GST Reconciliation (2A / 2B)</h3>
+                        <p>Matching purchase books with GSTR-2A/2B to claim maximum Input Tax Credit (ITC).</p>
+                        <div class="card-price-tag">₹2,500 – ₹6,000 <span>/ match</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Book vs Portal Automated Matching</li>
+                            <li><i class="fa-solid fa-check"></i> Maximum Input Tax Credit Claim</li>
+                            <li><i class="fa-solid fa-check"></i> Vendor Mismatch Reports</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20GST%20Reconciliation" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge gold">Annual Tax</div>
+                        <h3>ITR Filing (Salaried & Business)</h3>
+                        <p>Income Tax Return filing for individuals, freelancers, professionals, and businesses.</p>
+                        <div class="card-price-tag">₹1,500 – ₹5,000 <span>/ return</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> ITR-1, ITR-2, ITR-3, ITR-4 Filings</li>
+                            <li><i class="fa-solid fa-check"></i> Tax Savings Optimisation</li>
+                            <li><i class="fa-solid fa-check"></i> Computation Sheet & Acknowledgement</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20ITR%20Filing%20Service" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-category-block" id="sec-maintenance">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-arrows-rotate"></i> 6. Maintenance & Packages
+                </div>
+
+                <div class="media-preview-box">
+                    <h4 style="font-family:'Orbitron'; font-size:0.9rem; color:var(--neon-purple); margin-bottom:8px;">
+                        <i class="fa-solid fa-book-open"></i> Official Service Brochure & Retainer Guidelines
+                    </h4>
+                    <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:12px;">Download or view complete service deliverables, SLAs, and package brochures:</p>
+                    <!-- UPDATED DUAL BROCHURE BUTTONS IN MAINTENANCE BOX TOO -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="https://lh3.googleusercontent.com/d/1aXXeEnxnDOqIfApBO4dLRhNfjJdl36NS" target="_blank" class="btn-ai-outline">
+                            <i class="fa-solid fa-file-lines" style="color: var(--neon-blue);"></i> Service Brochure
+                        </a>
+                        <a href="https://lh3.googleusercontent.com/d/1jkKWnwUeC42D5nvJvzaanU5Y9S3vd3MK" target="_blank" class="btn-ai-outline">
+                            <i class="fa-solid fa-file-pdf" style="color: var(--neon-purple);"></i> Service Rate Brochure
+                        </a>
+                    </div>
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card-item">
+                        <div class="card-badge">Basic</div>
+                        <h3>Basic Monthly Plan</h3>
+                        <p>Weekly Excel reports, minor dataset cleaning, monthly review call, and dedicated support.</p>
+                        <div class="card-price-tag">₹2,500 <span>/ month</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Weekly Excel MIS Reports</li>
+                            <li><i class="fa-solid fa-check"></i> Minor Data Cleaning</li>
+                            <li><i class="fa-solid fa-check"></i> WhatsApp Support & Review Call</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Basic%20Maintenance%20Plan" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge gold">Standard</div>
+                        <h3>Standard Monthly Plan</h3>
+                        <p>Daily/Weekly reporting, Excel + Power BI hybrid dashboards, validation, and full monthly MIS package.</p>
+                        <div class="card-price-tag">₹5,000 <span>/ month</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Daily / Weekly MIS Reporting</li>
+                            <li><i class="fa-solid fa-check"></i> Auto-Updated Power BI + Excel Mix</li>
+                            <li><i class="fa-solid fa-check"></i> Data Cleaning & Validation Suite</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Standard%20Maintenance%20Plan" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+
+                    <div class="service-card-item">
+                        <div class="card-badge">Combo Pack</div>
+                        <h3>Business Starter Pack</h3>
+                        <p>Complete all-in-one starter bundle for growing businesses to organize data and upskill team.</p>
+                        <div class="card-price-tag">₹12,000 <span>/ package</span></div>
+                        <ul class="card-features">
+                            <li><i class="fa-solid fa-check"></i> Custom Excel Dashboard</li>
+                            <li><i class="fa-solid fa-check"></i> Data Cleaning Setup</li>
+                            <li><i class="fa-solid fa-check"></i> Weekly Reports Setup + 1 Staff Training</li>
+                        </ul>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Business%20Starter%20Pack" target="_blank" class="btn-ai-primary">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PORTFOLIO TAB -->
+    <div id="tab-portfolio" class="page-tab">
+        <div class="container">
+            
+            <!-- MAIN HEADING & BUTTON -->
+            <div class="banner-header" id="case-studies" style="margin-bottom: 40px;">
+                <h2 style="font-size: clamp(1.4rem, 2.5vw, 1.8rem); line-height: 1.4;">10 Years of Expertise in Data Analytics, <br> CRM Setup, & Financial Insights.</h2>
+                <p style="color: var(--text-dim); margin-top: 10px; font-size: 1rem;">Explore our delivered projects, automated dashboards, and seamless workflows.</p>
+                <div style="margin-top: 20px;">
+                    <button onclick="openConsultationModal()" class="btn-ai-primary" style="padding: 12px 25px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-calendar-check"></i> Book Free Consultation
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 1: DATA ANALYTICS -->
+            <div class="contact-detail-card" style="margin-bottom: 25px; padding: 25px;">
+                <div class="contact-detail-img-box" style="flex: 0 0 280px; display: flex; align-items: center; border: none; background: transparent;">
+                    <img src="https://lh3.googleusercontent.com/d/1GLxyZMHp9U4rFFHsEY9Z3wNKixERomp1" alt="Data Analytics" style="width: 100%; height: auto; object-fit: contain; border-radius: 8px;">
+                </div>
+                <div class="contact-detail-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px;">
+                        <h3 style="color: var(--neon-blue);"><i class="fa-solid fa-shield-halved"></i> Data Analytics & Business Intelligence</h3>
+                        <a onclick="toggleChatBox()" class="btn-ai-outline" style="padding: 6px 15px; font-size: 0.75rem;"><i class="fa-solid fa-robot"></i> Talk to AI</a>
+                    </div>
+                    <ul class="contact-feature-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Executive KPI Dashboards:</strong> Transformed multi-channel sales data into real-time Power BI tracking systems for leadership teams.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Excel Process Automation:</strong> Developed custom VBA macros that reduced weekly reporting time from hours to mere minutes.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Complex Data Modeling:</strong> Engineered SQL-based architectures to clean and unify fragmented records into a single source of truth.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SECTION 2: ZOHO CRM -->
+            <div class="contact-detail-card" style="margin-bottom: 25px; padding: 25px;">
+                <div class="contact-detail-img-box" style="flex: 0 0 280px; display: flex; align-items: center; border: none; background: transparent;">
+                    <img src="https://lh3.googleusercontent.com/d/1Ibn-ZC_qkSV3GOkgw77FTLgBx_toEw-R" alt="Zoho CRM" style="width: 100%; height: auto; object-fit: contain; border-radius: 8px;">
+                </div>
+                <div class="contact-detail-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px;">
+                        <h3 style="color: var(--neon-purple);"><i class="fa-solid fa-rocket"></i> Zoho CRM Setup & Automation</h3>
+                        <button onclick="openConsultationModal()" class="btn-ai-outline" style="padding: 6px 15px; font-size: 0.75rem;"><i class="fa-solid fa-briefcase"></i> Book Your Project</button>
+                    </div>
+                    <ul class="contact-feature-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>End-to-End Sales Pipelines:</strong> Successfully mapped and deployed complete lead-to-deal lifecycles for service-based businesses.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Custom Workflow Blueprints:</strong> Automated multi-tier notification systems, email alerts, and task assignments to ensure zero lead leakage.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Large-Scale Data Migration:</strong> Cleaned, structured, and migrated over 60 Lakh+ historical records into Zoho CRM with 100% accuracy.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SECTION 3: FINANCE & ACCOUNTING -->
+            <div class="contact-detail-card" style="margin-bottom: 25px; padding: 25px;">
+                <div class="contact-detail-img-box" style="flex: 0 0 280px; display: flex; align-items: center; border: none; background: transparent;">
+                    <img src="https://lh3.googleusercontent.com/d/1_NsBCMBh4IBqZ-QlRsvZL6tFR9ZPdQSP" alt="Finance & Accounting" style="width: 100%; height: auto; object-fit: contain; border-radius: 8px;">
+                </div>
+                <div class="contact-detail-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px;">
+                        <h3 style="color: var(--accent-green);"><i class="fa-solid fa-scale-balanced"></i> Finance & Accounting Services</h3>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20need%20help%20with%20GST%20and%20Finance" target="_blank" class="btn-ai-outline" style="padding: 6px 15px; font-size: 0.75rem;"><i class="fa-brands fa-whatsapp"></i> Chat with Expert</a>
+                    </div>
+                    <ul class="contact-feature-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>GST Portal Automation:</strong> Designed Excel-to-JSON utility tools that process thousands of B2B invoices for lightning-fast portal uploads.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Automated Reconciliation Engine:</strong> Created 2A/2B matching systems to quickly identify vendor discrepancies and maximize Input Tax Credit (ITC).</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Dynamic Financial Statements:</strong> Automated P&L and Balance Sheet generation to provide instant financial visibility to business owners.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Dynamic Financial Statements:</strong> Stop manual entry on the GST Portal. Use our Automated Excel Utility to convert thousands of invoices into JSON format in seconds.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>GST registration, monthly filing, and income tax return (ITR) preparation for small businesses.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Financial modeling for budgeting and forecasting in Excel involves building a structured workbook that separates historical data, driver-based assumptions, and dynamic projections to evaluate future financial performance.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SECTION 4: TRAINING SERVICES -->
+            <div class="contact-detail-card" style="margin-bottom: 25px; padding: 25px;">
+                <div class="contact-detail-img-box" style="flex: 0 0 280px; display: flex; align-items: center; border: none; background: transparent;">
+                    <img src="https://lh3.googleusercontent.com/d/1irpPp3DX-x4JQGbKid0UbzEFCSuuA9cv" alt="Staff Training" style="width: 100%; height: auto; object-fit: contain; border-radius: 8px;">
+                </div>
+                <div class="contact-detail-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px;">
+                        <h3 style="color: var(--accent-amber);"><i class="fa-solid fa-gear"></i> Data Solutions & Staff Training</h3>
+                        <button onclick="openConsultationModal()" class="btn-ai-outline" style="padding: 6px 15px; font-size: 0.75rem;"><i class="fa-solid fa-chalkboard-user"></i> Join Program</button>
+                    </div>
+                    <ul class="contact-feature-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Corporate Skill Advancement:</strong> Conducted hands-on Power BI and Advanced Excel workshops, upskilling multiple corporate teams.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Freelancer Mentorship Success:</strong> Guided students and professionals to launch successful profiles on Upwork and Fiverr, securing global clients.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Live Data Projects:</strong> Mentored candidates through real-world corporate data cleaning and analysis case studies to build strong portfolios.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Live Data Projects:</strong>Corporate Staff Trainer & Data Analysis: I act as a dedicated Staff Trainer, teaching Excel and Power BI to teams to help them handle data better.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Live Data Projects:</strong>Zoho CRM Setup & Automation: Complete setup of Zoho CRM for managing leads, sales pipelines, and automating business workflows.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Live Data Projects:</strong>Business Consulting: Helping small businesses identify gaps in their data strategy and providing actionable roadmaps.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SECTION 5: NEW - WEBSITE & TOOL BUILDER -->
+            <div class="contact-detail-card" style="margin-bottom: 35px; padding: 25px;">
+                <div class="contact-detail-img-box" style="flex: 0 0 280px; display: flex; align-items: center; border: none; background: transparent;">
+                    <img src="https://lh3.googleusercontent.com/d/1rNhXG3WzBXyfafEHHcxoVs4REQqzutTk" alt="Website Builder" style="width: 100%; height: auto; object-fit: contain; border-radius: 8px;">
+                </div>
+                <div class="contact-detail-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px;">
+                        <h3 style="color: var(--neon-cyan);"><i class="fa-solid fa-laptop-code"></i> Website & Custom Tool Builder</h3>
+                        <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20to%20build%20a%20website/tool" target="_blank" class="btn-ai-primary" style="padding: 6px 15px; font-size: 0.75rem;"><i class="fa-solid fa-code"></i> Build Your Website</a>
+                    </div>
+                    <ul class="contact-feature-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>High-Conversion Landing Pages:</strong> Designed and launched mobile-optimized, fast-loading business websites integrated with lead capture.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Internal Business Portals:</strong> Built secure, custom web applications for employee management, attendance, and client tracking.</div></li>
+                        <li><i class="fa-solid fa-check" style="margin-top: 4px; align-self: flex-start;"></i> <div><strong>Smart Calculators & Utilities:</strong> Developed dynamic web-based calculators and pricing tools embedded directly into client platforms.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- FOOTER BUTTON -->
+            <div style="text-align: center;">
+                <a onclick="showTab('home')" class="btn-ai-primary" style="background: linear-gradient(135deg, var(--accent-green), #047857); padding: 12px 30px; font-size: 0.95rem;">
+                    <i class="fa-solid fa-folder-open"></i> View Our Complete Portfolio
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NEW INTEGRATION TAB (MERGED GST TOOL) -->
+    <div id="tab-integration" class="page-tab">
+        <div class="integration-wrapper">
+            <div class="tool-container">
+                <img src="https://lh3.googleusercontent.com/d/1y8ION0fBqiMpDEwtkCef_3myUWnqyEI9" alt="Company Logo" class="company-logo">
+                
+                <h2><i class="fa-solid fa-scale-balanced" style="color: var(--accent-green);"></i> Finance & Accounting Automation</h2>
+                <p>Seamlessly process your sales records. Generate GST Portal ready JSON files or export directly for Tally/Zoho book entries.</p>
+
+                <div class="input-group">
+                    <label for="excelUpload"><i class="fa-solid fa-file-excel"></i> Upload Sales Record (Excel/CSV)</label>
+                    <input type="file" id="excelUpload" accept=".xlsx, .xls, .csv">
+                </div>
+
+                <button class="btn-ai-primary" onclick="generateGSTJSON()" style="padding: 14px 24px; font-size: 1rem; width: 100%; border-radius: 8px;">
+                    <i class="fa-solid fa-bolt"></i> Generate GST JSON Format
+                </button>
+
+                <button class="btn-ai-secondary" onclick="exportForAccounting()">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Export for Tally / Zoho Entry
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTACT TAB -->
+    <div id="tab-contact" class="page-tab">
+        <div class="container">
+            <div class="banner-header">
+                <h2>Get In Touch & Consultation Portals</h2>
+                <p style="color: var(--text-dim); margin-top: 6px; font-size: 0.9rem;">Select your domain to explore dedicated programs and access official registration forms:</p>
+            </div>
+
+            <div class="filter-buttons-container">
+                <button class="service-filter-btn active-filter" onclick="filterContacts('all', this)">
+                    <i class="fa-solid fa-border-all"></i> All Portals
+                </button>
+                <button class="service-filter-btn" onclick="filterContacts('contact-student', this)">
+                    <i class="fa-solid fa-graduation-cap"></i> Student Portal
+                </button>
+                <button class="service-filter-btn" onclick="filterContacts('contact-pro', this)">
+                    <i class="fa-solid fa-user-tie"></i> Professional Portal
+                </button>
+                <button class="service-filter-btn" onclick="filterContacts('contact-biz', this)">
+                    <i class="fa-solid fa-building"></i> Business Consultation
+                </button>
+            </div>
+
+            <div class="contact-category-block" id="contact-student">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-graduation-cap"></i> 1. Student Career Kickstart Portal
+                </div>
+                <div class="contact-detail-card">
+                    <div class="contact-detail-img-box">
+                        <img src="https://lh3.googleusercontent.com/d/1AWytaTh_6xiMiDqgpUY0ghjoAAKlodao" alt="Student Training" onerror="this.src='https://via.placeholder.com/220x180?text=Student+Program'">
+                    </div>
+                    <div class="contact-detail-content">
+                        <h3>Career Kickstart Program (Data & Analytics Track)</h3>
+                        <p>Specifically structured for students and fresh graduates seeking to build high-demand corporate technical skills. Learn Advanced Excel, SQL, Power BI, and Freelancing fundamentals with real corporate dataset projects.</p>
+                        <ul class="contact-feature-list">
+                            <li><i class="fa-solid fa-check"></i> Basic to Advanced Practical Curriculum</li>
+                            <li><i class="fa-solid fa-check"></i> Hands-on Case Studies & Live Projects</li>
+                            <li><i class="fa-solid fa-check"></i> Resume Building & Portfolio Review</li>
+                            <li><i class="fa-solid fa-check"></i> Freelancing Guidance (Fiverr & Upwork)</li>
+                        </ul>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px;">
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSf4pN3YlZrRTX05xWbZM2TXQ_sMDDTI614TwKhiGgEcqoW7rw/viewform" target="_blank" class="btn-ai-primary">
+                                <i class="fa-solid fa-file-pen"></i> Fill Student Application Form
+                            </a>
+                            <a href="https://wa.me/919891881990?text=Hi,%20I%20am%20a%20student%20inquiring%20about%20Career%20Kickstart%20Program" target="_blank" class="btn-ai-outline">
+                                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> WhatsApp Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-category-block" id="contact-pro">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-user-tie"></i> 2. Working Professional Upskilling Portal
+                </div>
+                <div class="contact-detail-card">
+                    <div class="contact-detail-img-box">
+                        <img src="https://lh3.googleusercontent.com/d/1yqRF5z0biggBapCY-dH2P6MduWIo3mSZ" alt="Professional Upskilling" onerror="this.src='https://via.placeholder.com/220x180?text=Professional+Portal'">
+                    </div>
+                    <div class="contact-detail-content">
+                        <h3>Professional Advancement & MIS Automation</h3>
+                        <p>Designed for corporate executives, accountants, and MIS leads to double workplace speed, automate repetitive manual reports, and master enterprise BI reporting for faster career growth and promotions.</p>
+                        <ul class="contact-feature-list">
+                            <li><i class="fa-solid fa-check"></i> Advanced DAX, Power Query & VBA Macros</li>
+                            <li><i class="fa-solid fa-check"></i> Zoho CRM Architecture & Webhook Automation</li>
+                            <li><i class="fa-solid fa-check"></i> Corporate Time-Saving Workflow Automation</li>
+                            <li><i class="fa-solid fa-check"></i> 1-on-1 Mentorship & Career Guidance</li>
+                        </ul>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px;">
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfy_f8XxKX-WpShsvXXxp1y8e_QUmLOgEbHb87usFOw7RdO4Q/viewform" target="_blank" class="btn-ai-primary">
+                                <i class="fa-solid fa-file-pen"></i> Fill Professional Form
+                            </a>
+                            <a href="https://wa.me/919891881990?text=Hi,%20I%20am%20a%20working%20professional%20inquiring%20about%20upskilling" target="_blank" class="btn-ai-outline">
+                                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> Consult Advisor
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-category-block" id="contact-biz">
+                <div class="services-section-title">
+                    <i class="fa-solid fa-building"></i> 3. Enterprise & Business Consultation Portal
+                </div>
+                <div class="contact-detail-card">
+                    <div class="contact-detail-img-box">
+                        <img src="https://lh3.googleusercontent.com/d/1v_Cr969uAKtjOOlKUbTGP8heuSdydr5W" alt="Business Consultation" onerror="this.src='https://via.placeholder.com/220x180?text=Business+Consultation'">
+                    </div>
+                    <div class="contact-detail-content">
+                        <h3>Business Automation, Data & CRM Advisory</h3>
+                        <p>Tailored enterprise solutions for growing businesses, startups, and SMEs. We audit existing workflows, construct custom Zoho CRM systems, build real-time Power BI executive dashboards, and handle financial compliance.</p>
+                        <ul class="contact-feature-list">
+                            <li><i class="fa-solid fa-check"></i> 60L+ Record System Data Migration</li>
+                            <li><i class="fa-solid fa-check"></i> Automated Sales Lead Pipeline Setup</li>
+                            <li><i class="fa-solid fa-check"></i> GST Reconciliation & Tax Compliance</li>
+                            <li><i class="fa-solid fa-check"></i> Custom Web Portal & API Integrations</li>
+                        </ul>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px;">
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfU9iYd9jDZP5c3NwymyGr2PIrhxytVPN3KKAaMk9jG1y8t0Q/viewform" target="_blank" class="btn-ai-primary">
+                                <i class="fa-solid fa-briefcase"></i> Submit Business Consultation Inquiry
+                            </a>
+                            <a href="https://wa.me/919891881990?text=Hi,%20I%20would%20like%20to%20schedule%20a%20Business%20Consultation" target="_blank" class="btn-ai-outline">
+                                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> Direct WhatsApp Connect
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; text-align: center; background: var(--card-bg); border: 1px solid var(--card-border); padding: 25px; border-radius: 14px;">
+                <h3 style="font-family:'Orbitron', sans-serif; color:var(--text-white); margin-bottom: 8px; font-size: 1.1rem;">
+                    Prefer Direct Channel Communication?
+                </h3>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 18px;">
+                    Reach out directly on our verified social or messaging channels for immediate response.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://wa.me/919891881990" target="_blank" class="btn-ai-primary">
+                        <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> WhatsApp Direct (+91 98918 81990)
+                    </a>
+                    <a href="https://t.me/fly2laksh" target="_blank" class="btn-ai-outline">
+                        <i class="fa-brands fa-telegram" style="font-size: 1.1rem; color: #38bdf8;"></i> Telegram Channel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHATBOT WIDGET -->
+    <div class="chat-widget-btn" onclick="toggleChatBox()">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <div class="chat-box-container" id="chat-box">
+        <div class="chat-header">
+            <div>
+                <h4 style="font-family:'Orbitron'; font-size:0.9rem;">fly2laksh AI Assistant</h4>
+                <span style="font-size:0.68rem; color:var(--accent-green);">● Online</span>
+            </div>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleChatBox()"></i>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="msg-bubble msg-bot">
+                Namaste! 👋 Main **fly2laksh** ka AI Assistant hoon. Rates ya services ke bare me puchne ke liye niche options tap karein!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-btn" onclick="sendQuickReply('Data Management')">📊 Data Mgmt</div>
+            <div class="chip-btn" onclick="sendQuickReply('Zoho Rates')">🚀 Zoho Services</div>
+            <div class="chip-btn" onclick="sendQuickReply('Website Rates')">🌐 Website Dev</div>
+            <div class="chip-btn" onclick="sendQuickReply('GST ITR Rates')">⚖️ GST & ITR</div>
+            <div class="chip-btn" onclick="sendQuickReply('Freelancing Training')">🎓 Freelancing</div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ask pricing or services..." onkeypress="handleKeyPress(event)">
+            <button class="chat-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-btns">
+            <a href="https://linkedin.com/in/fly2laksh" target="_blank" class="social-btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+            <a href="https://wa.me/919891881990" target="_blank" class="social-btn"><i class="fa-solid fa-bot"></i> <span class="ai-dynamic-text">fly2laksh</span>-AI</a>
+            <a href="https://www.youtube.com/@fly2laksh" target="_blank" class="social-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>
+            <a href="https://www.facebook.com/fly2laksh" target="_blank" class="social-btn"><i class="fa-brands fa-facebook"></i> Facebook</a>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-dim);">
+            Power BI • Excel Automation • Zoho CRM Architecture • Data Analytics
+        </p>
+        <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 8px;">
+            © 2026 <span class="ai-dynamic-text">fly2laksh</span>. All Rights Reserved. Contact: 098918 81990
+        </p>
+    </footer>
+
+    <!-- Diwali Special Preloader Script (Separate file for easy removal after Diwali) -->
+    <script src="js/preloader.js"></script>
+
+    <!-- Main Logic Script -->
     <script src="js/main.js"></script>
 </body>
 </html>
