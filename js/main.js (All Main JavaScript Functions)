@@ -1,0 +1,402 @@
+// --- CONSULTATION MODAL LOGIC & GOOGLE SHEET / WHATSAPP INTEGRATION ---
+function openConsultationModal() {
+    document.getElementById('consultationModal').style.display = 'flex';
+}
+
+function closeConsultationModal() {
+    document.getElementById('consultationModal').style.display = 'none';
+}
+
+function submitConsultationForm(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('c_name').value;
+    const phone = document.getElementById('c_phone').value;
+    const email = document.getElementById('c_email').value;
+    const service = document.getElementById('c_service').value;
+    const message = document.getElementById('c_message').value;
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyjC5lkFtOSnqXx_wRYBpuBX0XlDBAgBf_expPLkFFKFrFwq5tJHcP3td-lmQH7IhYMFg/exec';
+
+    fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, phone: phone, email: email, service: service, message: message })
+    })
+    .then(() => {
+        console.log('Saved to Google Sheet');
+    })
+    .catch(error => console.error('Error!', error.message));
+
+    const whatsappNumber = "919891881990";
+    const text = `*New Consultation Inquiry* 🚀%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${encodeURIComponent(phone)}%0A*Email:* ${encodeURIComponent(email)}%0A*Service:* ${encodeURIComponent(service)}%0A*Details:* ${encodeURIComponent(message)}`;
+    
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${text}`;
+
+    alert("Thank you! Your details have been saved, and WhatsApp is opening...");
+    window.open(whatsappURL, '_blank');
+    
+    closeConsultationModal();
+    document.getElementById('consultationForm').reset();
+}
+
+/* --- AI BANNER SLIDER LOGIC --- */
+let currentSlide = 0;
+const totalSlides = 7;
+let slideInterval = setInterval(autoBannerSlide, 2000);
+
+function updateBannerSlider() {
+    const slider = document.getElementById('aiBannerSlider');
+    const dots = document.querySelectorAll('#sliderDots .dot');
+    
+    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    dots.forEach((dot, index) => {
+        if (index === currentSlide) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+function moveBannerSlide(direction) {
+    currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+    updateBannerSlider();
+    resetSlideTimer();
+}
+
+function goToBannerSlide(index) {
+    currentSlide = index;
+    updateBannerSlider();
+    resetSlideTimer();
+}
+
+function autoBannerSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateBannerSlider();
+}
+
+function resetSlideTimer() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(autoBannerSlide, 4000);
+}
+
+function toggleMobileMenu() {
+    document.getElementById('nav-links').classList.toggle('active-menu');
+}
+
+function toggleDropdown(element) {
+    if (window.innerWidth <= 768) {
+        element.classList.toggle('open-dropdown');
+    }
+}
+
+function showTab(tabId, sectionId = null) {
+    const tabs = document.querySelectorAll('.page-tab');
+    const links = document.querySelectorAll('.nav-links > li > a');
+
+    tabs.forEach(tab => tab.classList.remove('active-tab'));
+    links.forEach(link => link.classList.remove('active-link'));
+
+    const targetTab = document.getElementById('tab-' + tabId);
+    const targetLink = document.getElementById('link-' + tabId);
+
+    if (targetTab) targetTab.classList.add('active-tab');
+    if (targetLink) targetLink.classList.add('active-link');
+
+    if (window.innerWidth <= 768) {
+        document.getElementById('nav-links').classList.remove('active-menu');
+    }
+
+    if (sectionId) {
+        if (tabId === 'services') {
+            filterServices(sectionId);
+        } else if (tabId === 'contact') {
+            filterContacts(sectionId);
+        }
+        
+        setTimeout(() => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 150);
+    } else {
+        if (tabId === 'services') filterServices('all');
+        if (tabId === 'contact') filterContacts('all');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function filterServices(categoryId, btnElement = null) {
+    const blocks = document.querySelectorAll('.service-category-block');
+    const buttons = document.querySelectorAll('#tab-services .service-filter-btn');
+
+    if (btnElement) {
+        buttons.forEach(btn => btn.classList.remove('active-filter'));
+        btnElement.classList.add('active-filter');
+    } else {
+        buttons.forEach(btn => {
+            btn.classList.remove('active-filter');
+            if (categoryId === 'all' && btn.textContent.includes('All Services')) {
+                btn.classList.add('active-filter');
+            } else if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(categoryId)) {
+                btn.classList.add('active-filter');
+            }
+        });
+    }
+
+    blocks.forEach(block => {
+        if (categoryId === 'all' || block.id === categoryId) {
+            block.style.display = 'block';
+        } else {
+            block.style.display = 'none';
+        }
+    });
+}
+
+function filterContacts(categoryId, btnElement = null) {
+    const blocks = document.querySelectorAll('.contact-category-block');
+    const buttons = document.querySelectorAll('#tab-contact .service-filter-btn');
+
+    if (btnElement) {
+        buttons.forEach(btn => btn.classList.remove('active-filter'));
+        btnElement.classList.add('active-filter');
+    } else {
+        buttons.forEach(btn => {
+            btn.classList.remove('active-filter');
+            if (categoryId === 'all' && btn.textContent.includes('All Portals')) {
+                btn.classList.add('active-filter');
+            } else if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(categoryId)) {
+                btn.classList.add('active-filter');
+            }
+        });
+    }
+
+    blocks.forEach(block => {
+        if (categoryId === 'all' || block.id === categoryId) {
+            block.style.display = 'block';
+        } else {
+            block.style.display = 'none';
+        }
+    });
+}
+
+function toggleChatBox() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.style.display = (chatBox.style.display === 'flex') ? 'none' : 'flex';
+}
+
+function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+function sendQuickReply(text) {
+    document.getElementById('chat-input').value = text;
+    sendMessage();
+}
+
+function sendMessage() {
+    const inputField = document.getElementById('chat-input');
+    const message = inputField.value.trim();
+    if (!message) return;
+
+    appendMessage(message, 'user');
+    inputField.value = '';
+
+    setTimeout(() => {
+        appendMessage(getBotResponse(message.toLowerCase()), 'bot');
+    }, 300);
+}
+
+function appendMessage(text, sender) {
+    const chatMessages = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('msg-bubble', sender === 'user' ? 'msg-user' : 'msg-bot');
+    msgDiv.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function getBotResponse(input) {
+    if (input.includes('data') || input.includes('excel') || input.includes('power bi')) 
+        return "📊 **Data Management Rates:**\n- Basic Excel Cleanup: ₹1,500 – ₹3,000\n- Advanced Dashboard: ₹5,000 – ₹15,000\n- Automation: ₹3,000 – ₹12,000\n- Power BI Reports: ₹10,000 – ₹35,000";
+    if (input.includes('zoho')) 
+        return "🚀 **Zoho Services Rates:**\n- Implementation: ₹35,000 – ₹80,000\n- Customisation: ₹12,000 – ₹25,000\n- Automation: ₹15,000 – ₹40,000";
+    if (input.includes('website') || input.includes('tool')) 
+        return "🌐 **Website & Tools Rates:**\n- Business Website: ₹8,000 – ₹25,000\n- Custom Web Tools / Portals: ₹15,000 – ₹45,000";
+    if (input.includes('gst') || input.includes('itr') || input.includes('finance')) 
+        return "⚖️ **Account & Finance Rates:**\n- GST Filing: ₹1,000 – ₹2,500/month\n- GST Reconciliation (2A/2B): ₹2,500 – ₹6,000\n- ITR Filing: ₹1,500 – ₹5,000/return";
+    if (input.includes('freelance') || input.includes('training') || input.includes('student')) 
+        return "🎓 **Training & Mentorship Rates:**\n- Freelancing Training (Fiverr/Upwork): ₹5,000 – ₹10,000\n- Staff Corporate Workshops: ₹4,000 – ₹25,000";
+    return "Kisee bhi query ke liye WhatsApp connect karein: **+91 98918 81990**! 🚀";
+}
+
+// Background Dot Canvas Particles
+const canvas = document.getElementById('dotCanvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.speedY = (Math.random() - 0.5) * 0.8;
+    }
+    draw() {
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.6)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+    }
+}
+
+const particleArray = Array.from({ length: 45 }, () => new Particle());
+function animateCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particleArray.forEach(p => { p.draw(); p.update(); });
+    requestAnimationFrame(animateCanvas);
+}
+animateCanvas();
+
+/* --- GST TOOL JAVASCRIPT --- */
+function readExcelFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                resolve(jsonData);
+            } catch (error) {
+                reject(error);
+            }
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function downloadFile(content, fileName, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+async function generateGSTJSON() {
+    const fileInput = document.getElementById('excelUpload');
+    if (!fileInput.files[0]) {
+        alert("Please upload the sales record file first!");
+        return;
+    }
+
+    try {
+        const rows = await readExcelFile(fileInput.files[0]);
+        let b2bData = [];
+        let b2csData = [];
+
+        rows.forEach(row => {
+            const gstin = row['GSTIN'] || row['Customer GSTIN'] || '';
+            const invNo = row['Invoice Number'] || row['Invoice No'] || '';
+            const invDate = row['Invoice Date'] || '';
+            const totalVal = parseFloat(row['Total Amount'] || row['Invoice Value'] || 0);
+            const taxableVal = parseFloat(row['Taxable Value'] || 0);
+            const rate = parseFloat(row['GST Rate'] || 18);
+
+            if (gstin.trim() !== '') {
+                b2bData.push({
+                    "ctin": gstin,
+                    "inv": [{
+                        "inum": invNo,
+                        "idt": invDate,
+                        "val": totalVal,
+                        "itms": [{
+                            "num": 1,
+                            "itm_det": {
+                                "txval": taxableVal,
+                                "rt": rate
+                            }
+                        }]
+                    }]
+                });
+            } else {
+                b2csData.push({
+                    "sply_ty": "INTRA",
+                    "rt": rate,
+                    "txval": taxableVal
+                });
+            }
+        });
+
+        const gstJSONObject = {
+            "gstin": "33AAAAA0000A1Z5",
+            "fp": "032026",
+            "b2b": b2bData,
+            "b2cs": b2csData
+        };
+
+        const jsonString = JSON.stringify(gstJSONObject, null, 2);
+        downloadFile(jsonString, "GSTR1_Sales_Data.json", "application/json");
+
+    } catch (err) {
+        alert("Error processing Excel file: " + err.message);
+    }
+}
+
+async function exportForAccounting() {
+    const fileInput = document.getElementById('excelUpload');
+    if (!fileInput.files[0]) {
+        alert("Please upload the sales record file first!");
+        return;
+    }
+
+    try {
+        const rows = await readExcelFile(fileInput.files[0]);
+        let csvRows = [];
+        csvRows.push([
+            "Invoice Date", "Invoice Number", "Customer Name", "GSTIN", "Taxable Value", "CGST", "SGST", "IGST", "Total Amount"
+        ].join(","));
+
+        rows.forEach(row => {
+            const date = row['Invoice Date'] || '';
+            const invNo = row['Invoice Number'] || row['Invoice No'] || '';
+            name = row['Customer Name'] || 'Cash Sale';
+            const gstin = row['GSTIN'] || row['Customer GSTIN'] || '';
+            const taxable = parseFloat(row['Taxable Value'] || 0);
+            const rate = parseFloat(row['GST Rate'] || 18);
+            
+            const taxAmount = (taxable * rate) / 100;
+            const cgst = gstin.startsWith("33") ? taxAmount / 2 : 0;
+            const sgst = gstin.startsWith("33") ? taxAmount / 2 : 0;
+            const igst = !gstin.startsWith("33") ? taxAmount : 0;
+            const total = taxable + taxAmount;
+
+            csvRows.push([
+                `"${date}"`, `"${invNo}"`, `"${name}"`, `"${gstin}"`,
+                taxable.toFixed(2), cgst.toFixed(2), sgst.toFixed(2), igst.toFixed(2), total.toFixed(2)
+            ].join(","));
+        });
+
+        const csvContent = csvRows.join("\n");
+        downloadFile(csvContent, "Accounting_Import_Ready.csv", "text/csv");
+
+    } catch (err) {
+        alert("Error exporting CSV: " + err.message);
+    }
+}
