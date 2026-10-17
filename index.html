@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fly2laksh - Service Rates & Promo Code</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background-color: #070b19; color: #ffffff; font-family: sans-serif; padding: 20px;">
+
+    <h1 style="text-align: center;">Official Services & Pricing</h1>
+
+    <!-- Promo Code Box -->
+    <div style="max-width: 400px; margin: 20px auto; display: flex; gap: 10px;">
+        <input type="text" id="promo-input" placeholder="Promo code dalein (e.g., FLY10)" style="padding: 10px; flex: 1; border: 1px solid #38bdf8; border-radius: 6px; background: #0f172a; color: #fff; text-transform: uppercase;">
+        <button onclick="applyPromoCode()" style="padding: 10px 20px; background: #38bdf8; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Apply</button>
+    </div>
+    <div id="promo-message" style="text-align: center; font-weight: bold; margin-bottom: 20px;"></div>
+
+    <!-- Service Card Example -->
+    <div style="border: 1px solid #0f172a; padding: 20px; border-radius: 10px; max-width: 400px; margin: 0 auto; background: #0f172a;">
+        <h3>Advanced Excel Dashboard</h3>
+        <p>Dynamic executive business dashboards built using XLOOKUP and Pivots.</p>
+        
+        <!-- Price Block -->
+        <div class="price" data-min="5000" data-max="15000" style="font-size: 1.2rem; font-weight: bold; color: #10b981;">
+            <span class="price-display">₹5,000 – ₹15,000</span>
+            <span>/ dashboard</span>
+        </div>
+    </div>
+
+    <!-- External JS File Link -->
+    <script src="js/main.js"></script>
+</body>
+</html>
