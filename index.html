@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- External CSS Link -->
+    <!-- External CSS File Link -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -24,28 +24,19 @@
     <!-- Navigation -->
     <nav>
         <a href="#" class="logo">
-            <img src="YOUR_LOGO_URL" alt="fly2laksh" class="bird-logo-img">
             <span>fly2laksh</span>
         </a>
 
-        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
         <ul class="nav-links" id="nav-links">
-            <li><a href="#home" class="active-link">HOME</a></li>
+            <li><a href="#home">HOME</a></li>
             <li><a href="#services">SERVICES</a></li>
-            <li><a href="#portfolio">PORTFOLIO</a></li>
             <li><a href="#contact">CONTACT</a></li>
         </ul>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero container" id="home">
+    <section class="container" id="home">
         <div class="hero-card">
-            <div class="hero-logo-box">
-                <img src="YOUR_LOGO_OR_IMAGE" alt="fly2laksh">
-            </div>
             <div class="hero-text">
                 <h1>Smart Data & Automation Solutions for Growing Businesses</h1>
                 <p>We convert messy, unstructured enterprise data into real-time business intelligence and automate sales workflows so you scale faster with precision.</p>
@@ -56,51 +47,29 @@
         </div>
     </section>
 
-    <!-- Why Choose Us -->
-    <section class="container">
-        <h2 class="section-title">Why Choose fly2laksh?</h2>
-        <div class="why-choose">
-            <img src="YOUR_FOUNDER_PHOTO" alt="Founder">
-            <div>
-                <h3>We Don't Just Organize Data — We Build Systems That Scale</h3>
-                <ul>
-                    <li><i class="fa-solid fa-check"></i> <strong>10+ Years of Corporate Expertise</strong> — Deep financial insight, advanced data analytics & workflow automation.</li>
-                    <li><i class="fa-solid fa-check"></i> <strong>Tailored Architecture</strong> — Migrated 60 Lakh+ records into Zoho CRM and built custom automation.</li>
-                    <li><i class="fa-solid fa-check"></i> <strong>Hard Impact Metrics</strong> — Reduce manual compliance prep time by up to 90%.</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- Core Pillars -->
-    <section class="container">
-        <h2 class="section-title">Our Core Capability Pillars</h2>
-        <div class="pillars">
-            <div class="pillar-card">
-                <h3>Smart Automation</h3>
-                <p>Eliminate manual entry errors with Excel-to-JSON tools and robust Zoho CRM workflows.</p>
-            </div>
-            <div class="pillar-card">
-                <h3>Data-Driven Insights</h3>
-                <p>Transform raw spreadsheets into interactive Power BI dashboards and SQL reports.</p>
-            </div>
-            <div class="pillar-card">
-                <h3>Financial Compliance</h3>
-                <p>Structured bookkeeping, Tally, GST and ITR computation handled accurately.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
+    <!-- Services Section & Promo Code -->
     <section class="container" id="services">
         <h2 class="section-title">Official Services & Pricing</h2>
+
+        <!-- Promo Code Input Box -->
+        <div class="promo-box">
+            <input type="text" id="promo-input" placeholder="Promo code dalein (e.g., FLY10)">
+            <button onclick="applyPromoCode()" class="btn-primary">Apply</button>
+        </div>
+        <div id="promo-message"></div>
 
         <div class="services-grid">
             <div class="service-card">
                 <span class="badge">Popular</span>
                 <h3>Advanced Excel Dashboard</h3>
                 <p>Dynamic executive business dashboards built using XLOOKUP, INDEX/MATCH, and Pivots.</p>
-                <div class="price">₹5,000 – ₹15,000 <span>/ dashboard</span></div>
+                
+                <!-- Price Box with attributes for JavaScript -->
+                <div class="price" data-min="5000" data-max="15000">
+                    <span class="price-display">₹5,000 – ₹15,000</span>
+                    <span>/ dashboard</span>
+                </div>
+
                 <a href="https://wa.me/919891881990?text=Hi,%20I%20want%20Advanced%20Excel%20Dashboard" class="btn-primary" target="_blank">
                     Inquire Now
                 </a>
@@ -114,7 +83,7 @@
     </footer>
 
     <!-- Consultation Modal -->
-    <div class="modal-overlay" id="consultationModal" style="display:none;">
+    <div class="modal-overlay" id="consultationModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeConsultationModal()"><i class="fa-solid fa-xmark"></i></button>
             <h3>Book Free Consultation</h3>
