@@ -1,4 +1,4 @@
-// Valid Promo Codes aur Discount %
+// Valid Promo Codes aur Discount Percentages
 const validPromoCodes = {
     "FLY10": 10,   // 10% Discount
     "FLY20": 20,   // 20% Discount
@@ -7,6 +7,7 @@ const validPromoCodes = {
 
 let currentDiscountPercent = 0;
 
+// Promo Code Function
 function applyPromoCode() {
     const promoInput = document.getElementById('promo-input').value.trim().toUpperCase();
     const promoMessage = document.getElementById('promo-message');
@@ -50,4 +51,25 @@ function resetPrices() {
 
         priceDisplay.innerHTML = `₹${minPrice.toLocaleString('en-IN')} – ₹${maxPrice.toLocaleString('en-IN')}`;
     });
+}
+
+// Modal Dialog Logic
+function openConsultationModal() {
+    document.getElementById('consultationModal').style.display = 'flex';
+}
+
+function closeConsultationModal() {
+    document.getElementById('consultationModal').style.display = 'none';
+}
+
+function submitConsultationForm(event) {
+    event.preventDefault();
+    const name = document.getElementById('c_name').value;
+    const phone = document.getElementById('c_phone').value;
+    
+    const message = `Hi, I am ${name}. Phone: ${phone}. I want to book a free consultation.`;
+    const whatsappUrl = `https://wa.me/919891881990?text=${encodeURIComponent(message)}`;
+    
+    window.open(whatsappUrl, '_blank');
+    closeConsultationModal();
 }
